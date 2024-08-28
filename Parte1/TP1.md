@@ -241,3 +241,238 @@ Bajo este se encuentran otros directorios importantes tales como:
 - `/var`: contiene directorios que cambian de tamaño con frecuencia
 
 En el momento de la instalación, GNU/Linux crea esta estructura de directorios básica, definida por la Filesystem Hierarchy Standard Group llamada Filesystem Hierarchy Standard (FHS). FHS define los directorios principales y sus contenidos. Se diseñó para estandarizar el sistema de archivos de las distribuciones GNU/Linux.
+
+___
+
+## **7. Particiones**
+
+### (a) Definición. Tipos de particiones. Ventajas y desventajas.
+
+Una partición en un disco es una división lógica del espacio de almacenamiento físico. Permite organizar y administrar los datos y programas del disco. Cada partición tiene su propio sistema de archivos y es tratado como un dispositivo de almacenamiento separado.
+Los tipos de particiones son:
+- Partición primaria: división básica del disco. Puede contener un SO. Su información se almacena en el MBR
+- Partición extendida: sirve para contener unidades lógicas en su interior. No se define un FS (File System) explícitamente sobre ella.
+- Partición lógica: ocupa totalidad o parte de la extendida y se le define un FS
+
+A su vez, según su función, se pueden tener particiones de arranque (boot), de datos y de intercambio (swap).
+
+Entre sus ventajas se pueden mencionar la organización, facilidad para crear copias de seguridad, tener múltiples FS, facilidad para instalar múltiples SO, entre otros.
+Los inconvenientes pueden estar dados por la reducción del almacenamiento (muchas particiones pueden generar insuficiencia de espacio en cada una), pérdida de datos (aunque estén dividadas lógicamente, pertenecen al mismo disco físico) y dificultad en el manejo de particiones para principiantes.
+
+### (b) ¿Cómo se identifican las particiones en GNU/Linux? (Considere discos IDE, SCSI y SATA).
+
+En GNU/Linux, todo se considera un archivo. Los dispositivos externos están identificados con el directorio `/dev/`, incluyendo en ese grupo a los dispositivos de almacenamiento secundario.
+Las particiones se identifican mediante nombres según el tipo de controlador y posición del dispositivo en el sistema.
+Los discos IDE se identifican con el prefijo `hd`. `hda` indica el primer disco, mientras `hdb` el segundo. Por otro lado, las particiones se indican con un número. `hda1` es la primer partición del primer disco IDE.
+Tanto los discos SCSI como SATA se identifican con `sd`. Siguiendo la misma lógica que los IDE, la letra corresponde al número de disco y el valor numérico a la partición. `sda1` indicaría la primer partición del primer disco.
+
+### (c) ¿Cuántas particiones son necesarias como mínimo para instalar GNU/Linux? Nómbrelas indicando tipo de partición, identificación, tipo de File System y punto de montaje.
+
+Para instalar GNU/Linux, es necesario como mínimo la partición primaria `/` (root directory), aunque es recomendable tener otras dos: `boot` (arranque) y `swap` (intercambio).
+- `/`: partición primaria. Suele usarse ext4 como FS (también puede ser ext3, ext2, btrfs, xfs). Su punto es montaje es `/`(root).
+- `swap`: puede ser primaria o lógica. No tiene FS como tal, es un tipo especial de partición. No tiene punto de montaje convencional, se utiliza como área de intercambio.
+- `boot`: primaria o lógica. Suele utilizar ext4 como FS. Su punto de montaje es `/boot`.
+
+### (d) Ejemplifique diversos casos de particionamiento dependiendo del tipo de tarea que se deba realizar en su SO.
+
+Para un usuario común, le bastaría con tener las dos particiones mínimas recomendadas (`/` y `swap`).
+Si se quisiera, también se podría particionar el sector de arranque y los archivos personales, dejando las siguientes particiones: `/`, `swap`, `/boot` y `/home`.
+Para un servidor web, podrían requerirse otras particiones, tales como: `/`, `/boot`, `swap`, `/home` (archivos de configuración y datos del usuario) y `/var` (archivos de logs y contenido web).
+Para un sistema que será utilizado por múltiples usuarios, podría ser necesario: `/`, `swap`, `/boot`, `/home` (datos de los usuarios), `/tmp` (archivos temporales).
+
+La cantidad y tipo de particiones dependerá del uso del sistema y el conocimiento del/los usuario/s.
+
+### (e) ¿Qué tipo de software para particionar existe? Menciónelos y compare.
+
+Existen múltiples softwares para particionar discos. Se dividen principalmente en destructivos y no destructivos.
+- Destructivos: permiten crear y eliminar particiones (ej.: **fdisk**).
+- No destructivos: permiten crear, eliminar y modificar particiones (ej.: **fips**, **gparted**).
+
+___
+
+## **8. Arranque (bootstrap) de un Sistema Operativo**
+
+### (a) ¿Qué es el **BIOS**? ¿Qué tarea realiza?
+
+BIOS es acrónimo de Basic Input/Output System. Se trata de un software integrado en un chip de la placa base que ejecuta una serie de procesos para gestionar el arranque del computador, activar servicios esenciales, gestionar ciertas funciones y comprobar el hardware (que funcione correctamente). Verifica que se cumplan los estándares mínimos para gestionar el arranque y delegar el control al sistema operativo.
+
+### (b) ¿Qué es UEFI? ¿Cuál es su función?
+
+UEFI (Unified Extensible Firmware Interface) es un estándar de interfaz de firmware que actúa como intermediario entre el hardware y el sistema operativo. Es el sucesor del BIOS.
+- Posee una interfaz gráfica más intuitiva 
+- Soporta mayor cantidad de particiones utilizando el esquema GPT (GUID Partition Table), ampliando el límite de 4 particiones primarias que permitía el MBR.
+- Permite un arranque más seguro debido a Secure Boot, que valida la firma digital de un sistema operativo antes de cargarlo
+- Almacena datos de arranque en la partición EFI
+
+Reemplaza al BIOS en sus tareas como gestión del proceso de arranque, configuración del sistema y protección del sistema.
+
+### (c) ¿Qué es el MBR? ¿Que es el MBC?
+
+Se llama MBR (Master Boot Record) al sector reservado del disco (cilindro 0, cabeza 0, sector 1) de tamaño 512 bytes.
+Se encarga del proceso de arranque y gestiona las particiones de los discos. Los primeros 446 corresponden al MBC (Master Boot Code), seguido de 64 bytes con la tabla de particiones (admite hasta 4 primarias o 3 primarias y una extendida). Los últimos 2 bytes contienen la firma del MBR.
+
+El MBC es una parte del MBR, siendo el código de arranque encargado de cargar el SO. El BIOS lee el MBC, lo lleva a memoria y lo ejecuta. Puede darse la carga del SO o un gestor de arranque.
+El MBC verifica la tabla de particiones para identificar la partición de arranque, carga su sector de arranque (Partition Boot Sector) y se tranfiere el control al código de arranque de la partición booteable para iniciar el SO
+
+Actualmente está siendo reemplazado por UEFI con el esquema de particiones GPT, debido a las limitantes del esquema MBR.
+
+### (d) ¿A qué hacen referencia las siglas GPT? ¿Qué sustituye? Indique cuál es su formato.
+
+GPT hace referencia a GUID Partition Table. Se sustituye la tabla de particiones de 64 bytes del MBR, para superar sus limitaciones en cuanto a cantidad de particiones. Utiliza modo de direccionamiento lógico LBA (Logical Block Adressing) en lugar de Cylinder-Header-Sector. La cabecera de GPT se encuentra en LBA1, haciendo de nexo con la tabla de particiones que se encuentra en los sectores adyacentes. Se encuentra al principio y final del disco por redundancia.
+
+### (e) ¿Cuál es la funcionalidad de un “Gestor de Arranque”? ¿Qué tipos existen? ¿Dónde se instalan? Cite gestores de arranque conocidos.
+
+La finalidad de un gestor de arranque es la de cargar la imagen del kernel seleccionado en memoria. Permite gestionar el arranque de los kernel que se tengan en las distintas particiones del disco. Se ejecuta luego del código del BIOS.
+Existen dos modos de instalación:
+- En el MBR (puede utilizar MBR gap (espacio de sectores adyacentes)).
+- En el sector de arranque de la partición raíz o activa (Volume Boot Record).
+
+El BIOS y UEFI también actúan como gestores de arranque. Los gestores de arranque pueden ser del tipo MBR o UEFI.
+
+Algunos gestores de arranque conocidos son: GRUB, LILO, GAG.
+
+### (f) ¿Cuáles son los pasos que se suceden desde que se prende una computadora hasta que el Sistema Operativo es cargado (proceso de bootstrap)?
+
+El bootstrap es el proceso de inicio de una máquina y carga del sistema operativo. En sistemas con BIOS, este es el encargado de iniciar la carga del sistema operativo a través del MBC. 
+Primero el BIOS (o UEFI) verifica el correcto funcionamiento del hardware (proceso POST). Luego, se busca el dispositivo de arranque primario. En sistemas basados en BIOS, se carga el programa de booteo desde el MBR. El gestor de arranque lanzado desde el MBC carga el Kernel, pasando luego el control al proceso init que inicia servicios esenciales y la interfaz de usuario.
+Este proceso de arranque se ve como una serie de pequeños programas de ejecución encadenada. El proceso de arranque basado en BIOS tiene como última acción leer el MBC del MBR.
+
+### (g) Analice el proceso de arranque en GNU/Linux y describa sus principales pasos.
+
+Los pasos del proceso de arranque fueron mencionados en el inciso anterior. En resumen, estos son:
+- Inicialización del BIOS/UEFI: se realiza el Power-On Self Test (POST) para verificar el hardware. Luego se busca y carga el gestor de arranque desde el sector de arranque (MBR o GPT).
+- Carga del bootloader: el gestor de arranque más común en GNU/Linux es GRUB. Este permite elegir el kernel a cargar.
+- Carga del Kernel de Linux: se carga el kernel en memoria y comienza a ejecutrase. Se inicializan controladores y se monta el Root File System.
+- Inicialización del sistema: proceso gestionado por `systemd`. Arranca y gestiona los servicios del sistema.
+- Montaje del sistema de archivos e inicio de servicios.
+- Inicio del entorno de usuario: se carga la GUI o CUI del sistema.
+- Sesión de usuario: se cargan configuraciones específicas del usuario.
+
+### (h) ¿Cuáles son los pasos que se suceden en el proceso de parada (shutdown) de GNU/Linux?
+
+Se compone de una serie de pasos:
+- Inicio del proceso de apagado: se envía señal al sistema para comenzar proceso de apagado (generalmente mediante comando)
+- Bloqueo de nuevas conexiones y procesos: se impide la ejecución de nuevas tareas
+- Detención de servicios: `systemd` comienza a detener los servicios en ejecución en orden inverso al que se iniciaron. Se liberan recursos y los servicios de detienen de forma controlada.
+- Desmontaje del File System: se desmontan sistemas de archivos excepto el sistema raíz. Los datos se sincronizan para evitar pérdidas.
+- Sincronización de buffers y cierre del sistema de archivos raíz: se escriben los datos pendientes de los buffes y se desmonta el sistema raíz, finalizando acceso al almacenamiento.
+- Apagado del hardware: una vez desmontado el FS y detenidos los servicios, se envía señal para apagar alimentación de la máquina.
+
+## (i) ¿Es posible tener en una PC GNU/Linux y otro Sistema Operativo instalado? Justifique.
+
+Si, es posible. En base a todo lo explicado anteriormente, es posible particionar el disco de forma que se almacenen dos SO distintos en diferentes particiones. Cuando inicia el proceso de arranque, pasando la etapa POST y la carga del gestor por parte del BIOS/UEFI, se da paso al bootloader (típicamente GRUB). Allí se permite seleccionar el kernel, para que este sea cargado en memoria y comienzo su proceso de inicialización anteriormente descrito.
+
+___
+
+## **9. Archivos**
+
+### (a) ¿Cómo se identifican los archivos en GNU/Linux?
+
+En GNU/Linux, los archivos se identifican mediante su nombre y ubicación en el FS. Hay varios conceptos relevantes sobre los mismos:
+- Ruta del archivo (absoluta o relativa)
+- Identificación mediante comandos (`ls` lista archivos y directorios, `file` indica el tipo, `stat` brinda información detallada)
+- Inodos (identificadores que describen a los archivos)
+
+### (b) Investigue el funcionamiento de los editores **vi** y **mcedit**, y los comandos **cat** y **more**.
+
+**Vi** es un editor de texto desarrollado para sistemas Unix. Posee interfaz visual y capacidad de mostrar la visualización completa del texto en pantalla. No posee herramientas visuales para anticipar apariencia impresa ni funciones avanzadas de formateo, pero es versatil en la manipulación de texto. Una de sus versiones mejoradas es **Vim**.
+
+**Mcedit** es el editor de archivos interno de GNU Midnight Commander (siendo este un gestor de ficheros para sistemas Unix, un shell con interfaz completa en modo texto).
+
+`cat` es abreviatura de concatenar, el comando es utilizado para manipular archivo. Es útil para combinar archivos, crear nuevos o mostrar el contenido de archivos existentes. Posee múltiples parámetros y opciones para realizar las funciones antes descritas.
+`more` es un comando que permite mostrar el resultado de la ejecución de un comando en la terminal de forma paginada. Permite visualizar la información de a páginas y se combina con múltiples comandos para lograr esta visualización.
+
+### (c) Cree un archivo llamado “prueba.exe” en su directorio personal usando el vi. El mismo debe contener su número de alumno y su nombre.
+
+El editor de texto se abre con `vi <nombre archivo>` para abrir un archivo existente o crearlo. Presionando "i" dentro del editor se ingresa al modo inserción.
+Finalmente, presionando ":" se ingresa al modo final de línea, donde "w" permite escribir los cambios y "q" salir.
+
+### (d) Investigue el funcionamiento del comando file. Pruébelo con diferentes archivos. ¿Qué diferencia nota?
+
+El comando `file <fichero>` muestra el tipo de un fichero.
+Diferencia entre distintos tipos y directorios. Para algunos revela más información (se probó con archivo ".gpg" y brinda información sobre su certificación y fecha de creación).
+
+___
+
+## **10. Indique qué comando es necesario utilizar para realizar cada una de las siguientes acciones. Investigue su funcionamiento y parámetros más importantes.**
+
+### (a, b) Cree carpeta ISO2024 y acceda
+
+`mkdir` crea un directorio.
+`cd <path>` permite acceder a un directorio en el path especificado.
+
+### (c, d, e, f) Cree dos archivos iso2024-1 e iso2024-2, liste contenido del directorio, visualice la ruta y busque archivos que contengan cadena "iso*"
+
+`touch <nombre_archivo>` para crear archivo.
+`ls <path>` para listar archivos en la ruta especificada (sin path lista en el directorio actual).
+`pwd` muestra ruta en la que se está situado.
+`find <directory_path> <search_parameter>` permite buscar archivos. `<directory_path>` puede ser la ruta del directorio o un "." para buscar en el directorio actual. `<search_parameter>` puede ser un nombre (`-name`), tipo (`-type`), tamaño (`-size`), etc. Si no se quiere buscar nombre exacto, sino coincidencia con una cadena se utiliza `find <directory_path> -name "<string>*"`. Pueden utilizarse otros parámetros para modificar la búsqueda o visualización de resultados en terminal.
+
+### (g, h, i, j) Informar espacio libre en disco, verificar usuarios conectados al sistema, ingresar Nombre y Apellido en archivo iso2024-1, mostrar en pantalla últimas lineas de un archivo.
+
+`df` muestra información sobre particiones montadas
+`who` muestra información de los usuarios conectados al sistema
+`tail <archivo>` muestra las últimas lineas de un archivo (10 por defecto).
+
+___
+
+## **(11, 12). Investigue su funcionamiento y parámetros más importantes. Indique en que directorios se almacenan los comandos mencionados.**
+
+- `shutdown`
+Apaga la máquina. `shutdown [OPTIONS] [TIME] [MESSAGE]` donde `[OPTIONS]` puede ser halt, power-off o reboot. `[TIME]` indica cuando se hará (ej.: now) y `[MESSAGE]` indica el mensaje a mostrar.
+Ubicado en `/usr/sbin/shutdown`.
+- `reboot`
+Reinicia la máquina. `reboot [OPTIONS]`, donde `[OPTIONS]` permite controlar cuestiones del comando (ej.: --force fuerza el reinicio).
+Ubicado en `/usr/sbin/reboot`.
+- `halt`
+Detiene el sistema. `halt [OPTIONS]`
+Ubicado en `/usr/sbin/halt`.
+- `locate`
+Busca en el FS por ficheros y directorios cuyo nombre coincida con un patrón dado. `locate [OPTION] PATTERN`
+Ubicado en `/usr/bin/locate`.
+- `uname`
+Imprime información del sistema. `uname [OPTION]` permite elegir toda la información(-a), nombre del kernel (-s), etc.
+Ubicado en `/usr/bin/uname`.
+- `dmesg`
+Imprime el buffer de mensajes del kernel, generados durante el arranque del sistema y depuración de aplicaciones. `dmesg [OPTIONS]`.
+Ubicado en `/usr/bin/dmesg`.
+- `lspci`
+Lista todos los dispositivos PCI (periféricos). `lspci [OPTIONS]` (principalmente modos para mostrar la información en pantalla).
+Ubicado en `/usr/bin/lspci`.
+- `at`
+Permite programar comandos para que sea ejecutados en una fecha y hora especificada. `at [time] [date/day]`.
+Ubicado en `/usr/bin/at`.
+- `netstat`
+Muestra información relacionada con la red y diagnostica errores de la misma. `netstat [OPTIONS]`.
+Ubicado en `/usr/bin/netstat`.
+- `mount`
+Monta un filesystem. Tiene varias formas (parámetros):
+    - `mount` muestra los dispositivos montados
+    - `mount -a [OPTIONS]` realiza una operación con todos los elementos mencionados
+    - `mount [OPTIONS] <source> <directory>`
+
+Ubicado en `/usr/bin/mount`.
+- `head`
+Muestra la primera parte (10 lineas) de un fichero. `head [OPTION]... [FILE]...`.
+Ubicado en `/usr/bin/head`
+- `losetup`
+Setea y controla loop devices (dispositivo virtual que permite que se acceda a un fichero como un dispositivo de bloques (ej.: disco duro)).
+Asocia loop devices con archivos regulares o dispositivos de bloques. Los loop devices se suelen utilizar para almacenar imágenes ISO de discos. Montar un archivo que contiene un FS en un loop device hace que se pueda acceder a los archivos del sistema de ficheros.
+`losetup [OPTIONS] [<loopdev>]`.
+Ubicado en `/usr/sbin/losetup`.
+- `write`
+Envía un mensaje a otro usuario. Permite comunicarse con otros usuarios, copiando líneas de su terminal a la de ellos.
+`write [OPTIONS] <user> [<ttyname>]` (ttyname terminal del usuario receptor).
+Ubicado en `/usr/bin/write`.
+- `mkfs`
+Crea un filesystem Linux en un dispositivo, usualmente una partición.
+`mkfs [OPTIONS] [-t type] [fs-options] device [size]`, siendo `device` el nombre del dispositivo, `size` el número de bloques que usará el filesystem, `-t` indica el tipo de filesystem a construir, `fs-options` comprende las opciones del filesystem específico que se pasarán al constructor del FS.
+Ubicado en `/usr/sbin/mkfs`.
+- `fdisk`
+Permite manipular la tabla de particiones de disco (crear y eliminar particiones, es destructivo).
+`fdisk [OPTIONS] device`.
+Ubicado en `/usr/sbin/fdisk`.
+
+___
+
+`which <command>` permite ver la ruta donde se almacena el comando.
