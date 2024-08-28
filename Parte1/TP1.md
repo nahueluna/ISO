@@ -451,7 +451,7 @@ Monta un filesystem. Tiene varias formas (parámetros):
     - `mount -a [OPTIONS]` realiza una operación con todos los elementos mencionados
     - `mount [OPTIONS] <source> <directory>`
 
-Ubicado en `/usr/bin/mount`.
+    Ubicado en `/usr/bin/mount`.
 - `head`
 Muestra la primera parte (10 lineas) de un fichero. `head [OPTION]... [FILE]...`.
 Ubicado en `/usr/bin/head`
