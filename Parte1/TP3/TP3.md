@@ -24,7 +24,7 @@ Las variables se declaran con la forma `<nombre_variable> = <valor>` y luego se 
 
 **(d)** Las backquotes en el comando `whoami` indican que lo introducido entre ellas será interpretado y ejecutado como comando por el Shell y se reemplazará por la salida estándar producida. En este caso, se ejecuta `whoami` y su resultado es introducido a la cadena de texto "Su usuario es: " para ser impreso en pantalla. La sintaxis de backquotes puede ser reemplazado por "$()".
 
-### 4. Parametrización: ¿Cómo se acceden a los parámetros enviados al script al momento de su invocación? ¿Qué información contienen las variables $#, $*, $? Y $HOME dentro de un script?
+### 4. Parametrización: ¿Cómo se acceden a los parámetros enviados al script al momento de su invocación? ¿Qué información contienen las variables \$#, $*, $? Y $HOME dentro de un script?
 
 Para acceder a los parámetros de un script se utilizan las variables posicionales: `$x`, donde x es el número de argumento (Ej.: $1, $s2, $3).
 `$#` indica la cantidad de argumentos pasados al script. `$*` representa todos los argumentos como un solo string. `$?` indica el código de salida del último comando ejecutado (útil para manejo de errores), representado 0 una ejecución correcta.
@@ -54,7 +54,7 @@ Los tipos de operaciones aceptadas son:
 - substr STRING POS LENGTH: obtener substring a partir de posicion de una determinada longitud
 - index STRING CHARS: índice donde se encuentra CHARS en STRING
 - length STRING
-- + TOKEN: interpreta TOKEN como string
+- \+ TOKEN: interpreta TOKEN como string
 - ( EXPRESSION ): valor de una expresion
 
 ### 7. El comando “test expresión” permite evaluar expresiones y generar un valor de retorno, true o false. Este comando puede ser reemplazado por el uso de corchetes de la siguiente manera [ expresión ]. Investigar que tipo de expresiones pueden ser usadas con el comando test. Tenga en cuenta operaciones para: evaluación de archivos, evaluación de cadenas de caracteres y evaluaciones numéricas.
