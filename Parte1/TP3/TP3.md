@@ -183,3 +183,30 @@ nombre() { block }
 
 Con la sentencia `return` se retorna un valor entre 0 y 255. El valor de retorno puede ser evaluado con "$?".
 Los argumentos se reciben en las variables $1, $2, etc. Para manejar el pasaje de parámetros, se usan dichas variables en el cuerpo de la función y luego en la invocación se pasan los argumentos necesarios.
+
+### 15. Comando cut
+
+El comando `cut` se utiliza para extraer secciones de líneas de texto de archivos o la entrada estándar, en base a delimitadores específicos o posiciones fijas.
+Algunos de sus parámetros son: 
+- `-f`: especifica los campos a extraer, basado en un delimitador. Ej.: `cut -f2 -d":" /etc/passwd` extrae el segundo campo de cada línea usando el `:` como delimitador.
+- `-d`: define el delimitador de los campos (por defecto es tabulación).
+- `-c`: extrae secciones de la línea según caracteres especificados. Ej.: `echo "123456789" | cut -c1-5` imprime caracteres del 1 al 5.
+- `--complement`: devuelve todo menos los campos o caracteres seleccionados. Ej.: `echo "1:2:3:4" | cut -d":" --complement -f2`. Establece la delimitación por `:` y suprime de la impresión el campo 2 (el `2`).
+- `s`: suprime las líneas que no contienen el delimitador específico.
+
+### Tips
+
+En un if:
+> `(())` se utiliza para evaluar expresiones aritméticas
+>
+> `[]` para evaluar cadenas, números y archivos con operadores de comparación. Es equivalente a test
+>
+> Sin ninguno de ellos es para evaluar el uso de comandos de shell que devuelven estado de éxito o fracaso
+
+Expresiones aritméticas:
+> Se utiliza `$(())` para realizar una operación aritmética, capturar su resultado y asignarlo a una variable, pues devuelve el valor de lo realizado. La sintaxis permite ejecutar un comando u operación y devolver el resultado
+>
+> `(())` evalúa expresiones aritméticas pero no devuelve un valor explícito (por eso se suele usar en sentencias if). Puede utilizarse para modificar variables directamente sin asignarlas
+
+En arreglos:
+> `arreglo+=($valor)` es una forma de agregar un elemento al final del arreglo
