@@ -197,16 +197,23 @@ Algunos de sus parámetros son:
 ### Tips
 
 En un if:
-> `(())` se utiliza para evaluar expresiones aritméticas
+> `((...))` se utiliza para evaluar expresiones aritméticas
 >
-> `[]` para evaluar cadenas, números y archivos con operadores de comparación. Es equivalente a test
+> `[...]` para evaluar cadenas, números y archivos con operadores de comparación. Es equivalente a test
 >
 > Sin ninguno de ellos es para evaluar el uso de comandos de shell que devuelven estado de éxito o fracaso
+>
+>`[[ ... ]]` provee una sintaxis más flexible y segura, especialmente para trabajar con cadenas, expresiones regulares y comparaciones lógicas complejas. Permite el uso de && y || en su interior. Es más robusto para comparaciones con cadenas que puedan tener espacios o estar vacías (no hace falta poner "").
 
 Expresiones aritméticas:
-> Se utiliza `$(())` para realizar una operación aritmética, capturar su resultado y asignarlo a una variable, pues devuelve el valor de lo realizado. La sintaxis permite ejecutar un comando u operación y devolver el resultado
+> Se utiliza `$((...))` para realizar una operación aritmética, capturar su resultado y asignarlo a una variable, pues devuelve el valor de lo realizado. La sintaxis permite ejecutar un comando u operación y devolver el resultado. Produce valor que puede usarse en expresiones, comandos o asignaciones
 >
-> `(())` evalúa expresiones aritméticas pero no devuelve un valor explícito (por eso se suele usar en sentencias if). Puede utilizarse para modificar variables directamente sin asignarlas
+> `((...))` evalúa expresiones aritméticas pero no devuelve un valor explícito (por eso se suele usar en sentencias if). Puede utilizarse para modificar variables directamente sin asignarlas. Debido a que no expande las expresiones, no se utiliza en comandos, sino más que nada para modificar variables o evaluar condiciones
 
 En arreglos:
 > `arreglo+=($valor)` es una forma de agregar un elemento al final del arreglo
+
+Comillas:
+> Comillas dobles `(" ")`: Expanden variables y comandos. Usarlas cuando se necesita expansión de variables o comandos dentro de una cadena.
+>
+> Comillas simples `(' ')`: No expanden nada. Usarlas cuando se quiera que todo dentro de las comillas sea tratado literalmente. No protege wildcards, sino que los toma como texto.
