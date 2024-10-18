@@ -16,14 +16,14 @@ if ! [ -d "$1" ]; then
     echo "El parámetro recibido no es un directorio" >&2
     exit 4
 else
-    files=$(find "$1" -maxdepth 1 -type f )
-    filesNumber=0
-
     # Modifica el separador de campo interno para que separe los elementos
     # por salto de línea, no por espacios (para archivos con espacios en su nombres) 
     IFS=$'\n'
     
-    for file in $files;
+    files=($(find "$1" -maxdepth 1 -type f ))
+    filesNumber=0
+
+    for file in ${files[@]};
     do
         if [[ -r $file && -w $file ]]; then
             (( filesNumber++ ))
