@@ -138,7 +138,7 @@ En su raíz, se encuentra systemd con un PID 1.
 En GNU/Linux existen usuarios root (administradores) y los usuarios extándar del sistema.
 Existen distintos archivos que guardan información sobre los usuarios. Algunos son:
 - `/etc/passwd`: atributos y configuraciones de los usuarios (como username, password, path del home, etc).
-- `/etc/group`: grupos del ssitema. Todo usuario pertenece a un grupo, lo que permite gestionar permisos del sistema.
+- `/etc/group`: grupos del sistema. Todo usuario pertenece a un grupo, lo que permite gestionar permisos del sistema.
 - `/etc/shadow`: almacena las contraseñas encriptadas de los usuarios del sistema.
 
 ### (b) ¿A qué hacen referencia las siglas UID y GID? ¿Pueden coexistir UIDs iguales en un sistema GNU/Linux? Justifique.
