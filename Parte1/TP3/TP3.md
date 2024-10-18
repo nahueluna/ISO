@@ -212,8 +212,21 @@ Expresiones aritméticas:
 
 En arreglos:
 > `arreglo+=($valor)` es una forma de agregar un elemento al final del arreglo
+>
+> `arreglo=($(comando))` permite asignar cada palabra de la salida estándar separada por el delimitador default (espacios o saltos de línea) en una posición del arreglo. El delimitador interno por defecto puede cambiarse modificando IFS (`IFS=$'\n'` para tomar solo saltos de línea y luego `unset IFS` para regresar al default)
 
 Comillas:
 > Comillas dobles `(" ")`: Expanden variables y comandos. Usarlas cuando se necesita expansión de variables o comandos dentro de una cadena.
 >
 > Comillas simples `(' ')`: No expanden nada. Usarlas cuando se quiera que todo dentro de las comillas sea tratado literalmente. No protege wildcards, sino que los toma como texto.
+
+`pushd` y `popd`
+> Sirven para apilar y desapilar directorios en la stack.
+>
+>`pushd` sirve para apilar el directorio indicado en la stack. Se debe indicar la ruta absoluta o relativa del directorio. Se produce el movimiento al directorio pusheado, pues es la nueva cabecera
+>
+>`popd` desapila el último directorio apilado y se mueve hacia la nueva cabecera.
+>
+>`dirs` muestra los directorios en la stack
+>
+>La cabecera de la stack es el directorio donde estás actualmente. Por ello siempre figurará un directorio en ella aunque no se permita hacer más popd (es el directorio en el que se comenzó cuando la pila estaba vacía)
