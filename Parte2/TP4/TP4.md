@@ -5,7 +5,7 @@
 ### (a) Programa y Proceso.
 
 Un proceso, también llamado tarea o job, es un programa en ejecución. Este es dinámico y posee program counter. Su ciclo de vida comprende desde que se lo ejecuta hasta que termina. Se entiende al proceso como una abstracción del programa. Este contiene información que no posee el programa, que le permite ejecutarse (tal como el espacio de memoria asignado).
-Según su historial de ejecución se pueden clasificar en CPU Bound (su ejecución comprende mayormente el uso de la CPU) o I/O Bound (mayormente ligados a las operaciones de entrada/salida).
+Según su historial de ejecución se pueden clasificar en CPU Bound (su ejecución comprende únicamente el uso de la CPU) o I/O Bound (mayormente ligados a las operaciones de entrada/salida).
 Cada proceso posee una PCB, una estructura que almacena información sobre el mismo. Es lo primero que se crea al crear el proceso (cuando se realiza un fork), y lo último que se desaloca cuando este finaliza.
 Los procesos transitan por distintos estados durante su ciclo de vida, tales como New, Ready, Running, entre otros.
 
@@ -28,7 +28,7 @@ El quantum es un intervalo de tiempo definido en el cual un proceso puede hacer 
 
 ### (e) ¿Qué significa que un algoritmo de scheduling sea apropiativo o no apropiativo (Preemptive o Non-Preemptive)?
 
-Los algoritmos de planificación (scheduling) de procesos pueden ser apropiativos (preemptive) o no apropiativos (non-preemptive). Un algoritmo es apropiativo cuando permite que un proceso en ejecución, que no ha finalizado, sea interrumpido por otro y envíado a la cola de Ready, para volver a competir por el uso de la CPU. Bajo estos algoritmos, los procesos no monopolizan la CPU, pero hay un mayor overhead (mayor cantidad de context switch).
+Los algoritmos de planificación (scheduling) de procesos pueden ser apropiativos (preemptive) o no apropiativos (non-preemptive). Un algoritmo es apropiativo cuando permite que un proceso en ejecución (Running), que no ha finalizado, sea interrumpido por otro y envíado a la cola de Ready, para volver a competir por el uso de la CPU. Bajo estos algoritmos, los procesos no monopolizan la CPU, pero hay un mayor overhead (mayor cantidad de context switch).
 Por otro lado, los algoritmos no apropiativos son aquellos en los cuales los procesos se ejecutan hasta terminar o bloquearse (por ejemplo, a la espera de una operación I/O). Un proceso no podrá interrumpir a otro para quitarle la CPU.
 
 ### (f) ¿Qué tareas realizan?:
@@ -144,6 +144,7 @@ Job 4, llegada 3, CPU 7, prioridad 2
 
 Job 1 se ejecutará durante 9 ciclos. Luego lo hará Job 2 durante 5 ciclos, seguido de Job 3 durante 3 ciclos. Finalmente Job 4 se ejecutará 7 ciclos.
 Para este algoritmo no apropiativo, no importa la prioridad, sino la columna que indica la llegada, pues ese es el orden en el que se ejecutan.
+Algoritmo no apropiativo, por ello los procesos CPU bound terminan en su primera selección para ingresar a la CPU.
 
 - SJF:
 
@@ -151,12 +152,15 @@ Se ejecuta Job 3 durante 3 ciclos, luego lo hace Job 2 durante 5 ciclos. Sigue J
 
 - Round Robin:
 
-Algoritmo apropiativo basado en un reloj. Existe un Quatum que determina el intervalo de tiempo que debe ejecutarse cada proceso. Existe su alternativa con Quantum fijo o variable. Sin embargo, de forma simplificada, consideremos un Q variable, donde el contador se inicializa en dicho valor cada vez que un proceso ingresa a la CPU.
+Algoritmo apropiativo basado en un reloj. Existe un Quatum que determina el intervalo de tiempo que debe ejecutarse cada proceso. Existe su alternativa con Quantum fijo o variable.
+Implementado con una cola circular. 
+Sin embargo, de forma simplificada, consideremos un Q variable, donde el contador se inicializa en dicho valor cada vez que un proceso ingresa a la CPU.
 De esta forma, los Jobs 1, 2, 3 y 4 se ejecutarán Q unidades de tiempo cada uno, en el orden en el que llegaron, volviendose a encolar hasta que finalicen su ejecución.
 
 - Prioridades:
 
 Primero se ejecutará Job 3, luego irá Job 2. Seguidamente se ejecutará Job 4 y finalmente lo hará Job 1. Este orden se basa en la prioridad que se le ha asignado a cada proceso. En caso de igual prioridad se ha desempatado mediante el PID menor entre ambos candidatos.
+Utiliza una cola por cada prioridad. Puede ser apropiativo o no.
 
 ### (b) ¿Alguno de ellos requiere algún parámetro para su funcionamiento?
 
@@ -227,6 +231,7 @@ Con un Quantum alto se reduce el overhead por context switch y se maximiza el us
 ### (b) ¿Nota alguna ventaja frente a otros algoritmos?
 
 El algoritmo SRTF presenta un tiempo de retorno promedio (TRP) y un tiempo de espera promedio (TEP) significativamente reducido en comparación con los demás algoritmos de planificación, probados sobre un mismo lote.
+SRTF es la versión apropiativa de SJF. Tanto SRTF como SJF toman el proceso con la siguiente ráfaga de CPU más corta. La diferencia está en que SJF es no apropiativo y SRTF es apropiativo.
 
 ## 8.
 
